@@ -11,7 +11,9 @@ import {
   interruptCurrentCycleAction,
   markCurrentCycleAsFinishedAction,
 } from '../reducers/cycles/action'
+
 import { differenceInSeconds } from 'date-fns'
+
 interface createCycleData {
   task: string
   minutesAmount: number
@@ -21,8 +23,8 @@ interface CyclesContextType {
   cycles: Cycle[]
   activeCycle: Cycle | undefined
   activeCycleId: string | null
+  amountSecondsPassed: number
   markCurrentCycleAsFinished: () => void
-  amountSeconsdPassed: number
   setSecondsPassed: (seconds: number) => void
   createNewCycle: (data: createCycleData) => void
   InterruptCurrentCycle: () => void
@@ -56,10 +58,11 @@ export function CyclesContextProvider({
   const { cycles, activeCycleId } = cyclesState
   const activeCycle = cycles.find((cycle) => cycle.id === activeCycleId)
 
-  const [amountSeconsdPassed, setAmountSecondsPassed] = useState(() => {
+  const [amountSecondsPassed, setAmountSecondsPassed] = useState(() => {
     if (activeCycle) {
       return differenceInSeconds(new Date(), new Date(activeCycle.startDate))
     }
+    return 0
   })
 
   function setSecondsPassed(seconds: number) {
@@ -78,7 +81,6 @@ export function CyclesContextProvider({
       startDate: new Date(),
     }
     dispatch(addNewCycleAction(newCycle))
-
     setAmountSecondsPassed(0)
   }
 
@@ -98,7 +100,7 @@ export function CyclesContextProvider({
         activeCycleId,
         activeCycle,
         markCurrentCycleAsFinished,
-        amountSeconsdPassed,
+        amountSecondsPassed,
         setSecondsPassed,
         createNewCycle,
         InterruptCurrentCycle,
